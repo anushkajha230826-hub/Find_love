@@ -77,9 +77,9 @@ function loadModel(path, xPos, name) {
 }
 
 // ⚠️ IMPORTANT: files are in ROOT, NOT models folder
-loadModel("./monkey.glb", -2, "MONKEY");
-loadModel("./penguin.glb", 2, "PENGUIN");
-loadModel("./villain.glb", 0, "VILLAIN");
+loadModel("/monkey.glb", -2, "MONKEY");
+loadModel("/penguin.glb", 2, "PENGUIN");
+loadModel("/villain.glb", 0, "VILLAIN");
 
 // ============================
 // RESIZE
