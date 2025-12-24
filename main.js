@@ -1,68 +1,72 @@
 const monkey = document.getElementById("monkey");
 const penguin = document.getElementById("penguin");
 const villain = document.getElementById("villain");
-const msg = document.getElementById("msg");
+const overlay = document.getElementById("overlay");
 
-let monkeyX = 50;
-let gameEnded = false;
+let monkeyPos = { x: window.innerWidth / 2, y: window.innerHeight - 150 };
+let targetPos = { ...monkeyPos };
 
-function moveMonkey() {
-  if (gameEnded) return;
+let villainPos = { x: 100, y: 100 };
 
-  monkeyX += 30;
-  monkey.style.left = monkeyX + "px";
-
-  checkCollision();
+function place(el, pos) {
+  el.style.left = pos.x + "px";
+  el.style.top = pos.y + "px";
 }
 
-function checkCollision() {
-  const m = monkey.getBoundingClientRect();
-  const p = penguin.getBoundingClientRect();
-  const v = villain.getBoundingClientRect();
+place(monkey, monkeyPos);
+place(villain, villainPos);
 
-  // Monkey hits villain
-  if (intersect(m, v)) {
-    msg.innerText = "💀 Villain blocked you!";
-    shake(villain);
-    monkeyX = 50;
-    monkey.style.left = monkeyX + "px";
+// random penguin location
+place(penguin, {
+  x: Math.random() * (window.innerWidth - 200) + 100,
+  y: Math.random() * (window.innerHeight - 300) + 150
+});
+
+// tap / click to move
+document.addEventListener("pointerdown", e => {
+  targetPos.x = e.clientX;
+  targetPos.y = e.clientY;
+});
+
+// distance helper
+function dist(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// game loop
+function animate() {
+  // monkey movement (smooth)
+  monkeyPos.x += (targetPos.x - monkeyPos.x) * 0.08;
+  monkeyPos.y += (targetPos.y - monkeyPos.y) * 0.08;
+  place(monkey, monkeyPos);
+
+  // villain slow chase
+  villainPos.x += (monkeyPos.x - villainPos.x) * 0.01;
+  villainPos.y += (monkeyPos.y - villainPos.y) * 0.01;
+  place(villain, villainPos);
+
+  // lose condition
+  if (dist(monkeyPos, villainPos) < 80) {
+    endGame("YOU WERE FOUND");
   }
 
-  // Monkey reaches penguin
-  if (intersect(m, p)) {
-    msg.innerText = "🫂 Love Found!";
-    gameEnded = true;
-    hug();
+  // win condition
+  const penguinPos = {
+    x: penguin.offsetLeft,
+    y: penguin.offsetTop
+  };
+
+  if (dist(monkeyPos, penguinPos) < 80) {
+    endGame("FOUND LOVE");
   }
+
+  requestAnimationFrame(animate);
 }
 
-function intersect(a, b) {
-  return !(
-    a.right < b.left ||
-    a.left > b.right ||
-    a.bottom < b.top ||
-    a.top > b.bottom
-  );
+function endGame(text) {
+  overlay.innerText = text;
+  overlay.style.display = "flex";
+  document.removeEventListener("pointerdown", () => {});
 }
 
-function shake(el) {
-  el.style.animation = "none";
-  el.offsetHeight;
-  el.style.animation = "shake 0.4s";
-}
-
-function hug() {
-  penguin.style.transform = "scale(1.1)";
-  monkey.style.transform = "scale(1.1)";
-}
-
-// tap / click
-document.body.addEventListener("click", moveMonkey);
-
-// villain idle movement
-setInterval(() => {
-  if (!gameEnded) {
-    villain.style.left =
-      40 + Math.sin(Date.now() / 600) * 10 + "%";
-  }
-}, 50);
+animate();
