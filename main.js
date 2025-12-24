@@ -1,125 +1,68 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+const monkey = document.getElementById("monkey");
+const penguin = document.getElementById("penguin");
+const villain = document.getElementById("villain");
+const msg = document.getElementById("msg");
 
-// =====================
-// SCENE
-// =====================
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+let monkeyX = 50;
+let gameEnded = false;
 
-// =====================
-// CAMERA
-// =====================
-const camera = new THREE.PerspectiveCamera(
-  60,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  100
-);
-camera.position.set(0, 1.5, 6);
+function moveMonkey() {
+  if (gameEnded) return;
 
-// =====================
-// RENDERER
-// =====================
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
+  monkeyX += 30;
+  monkey.style.left = monkeyX + "px";
 
-// =====================
-// LIGHTS
-// =====================
-scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-
-const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-dirLight.position.set(5, 10, 5);
-scene.add(dirLight);
-
-// =====================
-// FLOOR
-// =====================
-const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(30, 30),
-  new THREE.MeshStandardMaterial({ color: 0x222222 })
-);
-floor.rotation.x = -Math.PI / 2;
-scene.add(floor);
-
-// =====================
-// LOADER
-// =====================
-const loader = new GLTFLoader();
-
-let monkey, penguin, villain;
-
-// =====================
-// LOAD MONKEY (BF)
-// =====================
-loader.load(
-  "./monkey.glb",
-  (gltf) => {
-    monkey = gltf.scene;
-    monkey.scale.set(1, 1, 1);
-    monkey.position.set(-1.5, 0, 0);
-    scene.add(monkey);
-    console.log("🐒 Monkey loaded");
-  },
-  undefined,
-  (err) => console.error("Monkey error", err)
-);
-
-// =====================
-// LOAD PENGUIN (GF)
-// =====================
-loader.load(
-  "./penguin.glb",
-  (gltf) => {
-    penguin = gltf.scene;
-    penguin.scale.set(1, 1, 1);
-    penguin.position.set(1.5, 0, 0);
-    scene.add(penguin);
-    console.log("🐧 Penguin loaded");
-  },
-  undefined,
-  (err) => console.error("Penguin error", err)
-);
-
-// =====================
-// LOAD VILLAIN
-// =====================
-loader.load(
-  "./villain.glb",
-  (gltf) => {
-    villain = gltf.scene;
-    villain.scale.set(1, 1, 1);
-    villain.position.set(0, 0, -3);
-    scene.add(villain);
-    console.log("👿 Villain loaded");
-  },
-  undefined,
-  (err) => console.error("Villain error", err)
-);
-
-// =====================
-// RESIZE
-// =====================
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-// =====================
-// ANIMATION LOOP
-// =====================
-function animate() {
-  requestAnimationFrame(animate);
-
-  if (monkey) monkey.rotation.y += 0.005;
-  if (penguin) penguin.rotation.y -= 0.005;
-  if (villain) villain.rotation.y += 0.01;
-
-  renderer.render(scene, camera);
+  checkCollision();
 }
 
-animate();
+function checkCollision() {
+  const m = monkey.getBoundingClientRect();
+  const p = penguin.getBoundingClientRect();
+  const v = villain.getBoundingClientRect();
+
+  // Monkey hits villain
+  if (intersect(m, v)) {
+    msg.innerText = "💀 Villain blocked you!";
+    shake(villain);
+    monkeyX = 50;
+    monkey.style.left = monkeyX + "px";
+  }
+
+  // Monkey reaches penguin
+  if (intersect(m, p)) {
+    msg.innerText = "🫂 Love Found!";
+    gameEnded = true;
+    hug();
+  }
+}
+
+function intersect(a, b) {
+  return !(
+    a.right < b.left ||
+    a.left > b.right ||
+    a.bottom < b.top ||
+    a.top > b.bottom
+  );
+}
+
+function shake(el) {
+  el.style.animation = "none";
+  el.offsetHeight;
+  el.style.animation = "shake 0.4s";
+}
+
+function hug() {
+  penguin.style.transform = "scale(1.1)";
+  monkey.style.transform = "scale(1.1)";
+}
+
+// tap / click
+document.body.addEventListener("click", moveMonkey);
+
+// villain idle movement
+setInterval(() => {
+  if (!gameEnded) {
+    villain.style.left =
+      40 + Math.sin(Date.now() / 600) * 10 + "%";
+  }
+}, 50);
