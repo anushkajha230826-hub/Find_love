@@ -1,114 +1,65 @@
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-const rotateUI = document.getElementById("rotate");
+window.onload = function() {
+  // Canvas setup
+  const canvas = document.createElement('canvas');
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width = Math.max(window.innerWidth, window.innerHeight); // horizontal layout
+  canvas.height = Math.min(window.innerWidth, window.innerHeight);
 
-function resize() {
-  if (window.innerWidth < window.innerHeight) {
-    rotateUI.style.display = "flex";
-  } else {
-    rotateUI.style.display = "none";
+  // Load images
+  const monkey = new Image();
+  monkey.src = "monkey.png";
+
+  const penguin = new Image();
+  penguin.src = "penguin.png";
+
+  const villain = new Image();
+  villain.src = "villain.png";
+
+  // Character positions
+  let monkeyPos = { x: 50, y: canvas.height / 2 - 75 };
+  const penguinPos = { x: 350, y: canvas.height / 2 - 75 };
+  const villainPos = { x: 650, y: canvas.height / 2 - 75 };
+
+  // Monkey movement
+  let targetPos = { x: monkeyPos.x, y: monkeyPos.y };
+
+  // Tap/click to move
+  canvas.addEventListener('click', (e) => {
+    targetPos.x = e.clientX - 75;
+    targetPos.y = e.clientY - 75;
+  });
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background (fake 3D shadow effect)
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Move monkey towards target
+    const dx = targetPos.x - monkeyPos.x;
+    const dy = targetPos.y - monkeyPos.y;
+    monkeyPos.x += dx * 0.1;
+    monkeyPos.y += dy * 0.1;
+
+    // Draw characters
+    ctx.drawImage(monkey, monkeyPos.x, monkeyPos.y, 150, 150);
+    ctx.drawImage(penguin, penguinPos.x, penguinPos.y, 150, 150);
+    ctx.drawImage(villain, villainPos.x, villainPos.y, 150, 150);
+
+    requestAnimationFrame(draw);
   }
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resize);
-resize();
-
-// Load images
-const monkey = new Image();
-monkey.src = "monkey.png";
-
-const penguin = new Image();
-penguin.src = "penguin.png";
-
-const villain = new Image();
-villain.src = "villain.png";
-
-const player = {
-  x: 100,
-  y: canvas.height / 2,
-  w: 120,
-  h: 120,
-  targetX: 100,
-  targetY: canvas.height / 2
-};
-
-const goal = {
-  x: () => canvas.width - 200,
-  y: () => canvas.height / 2,
-  w: 140,
-  h: 140
-};
-
-const enemy = {
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  w: 160,
-  h: 160,
-  dir: 1
-};
-
-// Tap / click movement
-function move(e) {
-  const touch = e.touches ? e.touches[0] : e;
-  player.targetX = touch.clientX - player.w / 2;
-  player.targetY = touch.clientY - player.h / 2;
-}
-
-canvas.addEventListener("click", move);
-canvas.addEventListener("touchstart", move);
-
-// Collision
-function hit(a, b) {
-  return (
-    a.x < b.x + b.w &&
-    a.x + a.w > b.x &&
-    a.y < b.y + b.h &&
-    a.y + a.h > b.y
-  );
-}
-
-function update() {
-  // Smooth movement
-  player.x += (player.targetX - player.x) * 0.08;
-  player.y += (player.targetY - player.y) * 0.08;
-
-  // Enemy floating movement
-  enemy.y += enemy.dir * 1.5;
-  if (enemy.y < 100 || enemy.y > canvas.height - 200) enemy.dir *= -1;
-
-  // Win
-  if (hit(player, { ...goal, x: goal.x(), y: goal.y() })) {
-    alert("You found love 🖤");
-    location.reload();
-  }
-
-  // Lose
-  if (hit(player, enemy)) {
-    alert("Consumed by darkness");
-    location.reload();
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Subtle floor glow
-  const g = ctx.createLinearGradient(0, canvas.height, 0, 0);
-  g.addColorStop(0, "#000");
-  g.addColorStop(1, "#111");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Penguin (goal)
-  ctx.drawImage(penguin, goal.x(), goal.y(), goal.w, goal.h);
-
-  // Villain
-  ctx.drawImage(villain, enemy.x, enemy.y, enemy.w, enemy.h);
-
-  // Monkey (player)
-  ctx.drawImage(monkey, player.x, player.y, player.w, player.h);
+  // Start drawing after all images load
+  let imagesLoaded = 0;
+  [monkey, penguin, villain].forEach(img => {
+    img.onload = () => {
+      imagesLoaded++;
+      if (imagesLoaded === 3) draw();
+    };
+  });
+};  ctx.drawImage(monkey, player.x, player.y, player.w, player.h);
 }
 
 function loop() {
