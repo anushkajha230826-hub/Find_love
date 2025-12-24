@@ -1,72 +1,125 @@
-const game = document.getElementById("game");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const rotateUI = document.getElementById("rotate");
 
-const width = window.innerWidth;
-const height = window.innerHeight;
+function resize() {
+  if (window.innerWidth < window.innerHeight) {
+    rotateUI.style.display = "flex";
+  } else {
+    rotateUI.style.display = "none";
+  }
 
-// ----- CREATE CHARACTER -----
-function createCharacter(src, size) {
-  const img = document.createElement("img");
-  img.src = src;
-  img.className = "character";
-  img.style.width = size + "px";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
 
-  const shadow = document.createElement("div");
-  shadow.className = "shadow";
+// Load images
+const monkey = new Image();
+monkey.src = "monkey.png";
 
-  game.appendChild(shadow);
-  game.appendChild(img);
+const penguin = new Image();
+penguin.src = "penguin.png";
 
-  return { img, shadow };
+const villain = new Image();
+villain.src = "villain.png";
+
+const player = {
+  x: 100,
+  y: canvas.height / 2,
+  w: 120,
+  h: 120,
+  targetX: 100,
+  targetY: canvas.height / 2
+};
+
+const goal = {
+  x: () => canvas.width - 200,
+  y: () => canvas.height / 2,
+  w: 140,
+  h: 140
+};
+
+const enemy = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  w: 160,
+  h: 160,
+  dir: 1
+};
+
+// Tap / click movement
+function move(e) {
+  const touch = e.touches ? e.touches[0] : e;
+  player.targetX = touch.clientX - player.w / 2;
+  player.targetY = touch.clientY - player.h / 2;
 }
 
-// ----- CHARACTERS -----
-const monkey = createCharacter("monkey.png", 120);
-const penguin = createCharacter("penguin.png", 110);
-const villain = createCharacter("villain.png", 130);
+canvas.addEventListener("click", move);
+canvas.addEventListener("touchstart", move);
 
-// ----- POSITIONS -----
-let monkeyPos = { x: width * 0.2, y: height * 0.6 };
-let penguinPos = { x: width * 0.75, y: height * 0.55 };
-let villainPos = { x: width * 0.5, y: height * 0.35 };
-
-let target = { ...monkeyPos };
-
-// ----- PLACE FUNCTION -----
-function place(char, pos, scale = 1) {
-  char.img.style.left = pos.x + "px";
-  char.img.style.top = pos.y + "px";
-  char.img.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
-  char.shadow.style.left = pos.x + "px";
-  char.shadow.style.top = (pos.y + 55) + "px";
+// Collision
+function hit(a, b) {
+  return (
+    a.x < b.x + b.w &&
+    a.x + a.w > b.x &&
+    a.y < b.y + b.h &&
+    a.y + a.h > b.y
+  );
 }
 
-// ----- INITIAL DRAW -----
-place(monkey, monkeyPos, 1);
-place(penguin, penguinPos, 0.9);
-place(villain, villainPos, 1.05);
-
-// ----- DEPTH EFFECT -----
-function depthScale(y) {
-  return 0.8 + (y / height) * 0.4;
-}
-
-// ----- MOVE -----
-game.addEventListener("click", (e) => {
-  target.x = e.clientX;
-  target.y = e.clientY;
-});
-
-// ----- GAME LOOP -----
 function update() {
-  monkeyPos.x += (target.x - monkeyPos.x) * 0.08;
-  monkeyPos.y += (target.y - monkeyPos.y) * 0.08;
+  // Smooth movement
+  player.x += (player.targetX - player.x) * 0.08;
+  player.y += (player.targetY - player.y) * 0.08;
 
-  place(monkey, monkeyPos, depthScale(monkeyPos.y));
-  place(penguin, penguinPos, depthScale(penguinPos.y));
-  place(villain, villainPos, depthScale(villainPos.y));
+  // Enemy floating movement
+  enemy.y += enemy.dir * 1.5;
+  if (enemy.y < 100 || enemy.y > canvas.height - 200) enemy.dir *= -1;
 
-  requestAnimationFrame(update);
+  // Win
+  if (hit(player, { ...goal, x: goal.x(), y: goal.y() })) {
+    alert("You found love 🖤");
+    location.reload();
+  }
+
+  // Lose
+  if (hit(player, enemy)) {
+    alert("Consumed by darkness");
+    location.reload();
+  }
 }
 
-update();
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Subtle floor glow
+  const g = ctx.createLinearGradient(0, canvas.height, 0, 0);
+  g.addColorStop(0, "#000");
+  g.addColorStop(1, "#111");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Penguin (goal)
+  ctx.drawImage(penguin, goal.x(), goal.y(), goal.w, goal.h);
+
+  // Villain
+  ctx.drawImage(villain, enemy.x, enemy.y, enemy.w, enemy.h);
+
+  // Monkey (player)
+  ctx.drawImage(monkey, player.x, player.y, player.w, player.h);
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Start only after images load
+Promise.all([
+  new Promise(r => monkey.onload = r),
+  new Promise(r => penguin.onload = r),
+  new Promise(r => villain.onload = r)
+]).then(loop);
