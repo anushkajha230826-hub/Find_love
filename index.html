@@ -1,67 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>Find Love</title>
+  <meta charset="UTF-8" />
+  <title>Find Love</title>
 
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    touch-action: manipulation;
-  }
+  <!-- Force landscape look -->
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
 
-  body {
-    background: linear-gradient(180deg, #0e0e0e, #1a1a1a);
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    font-family: sans-serif;
-  }
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at center, #1a1a1a, #000);
+      overflow: hidden;
+      touch-action: none;
+      font-family: system-ui, sans-serif;
+    }
 
-  #game {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
+    canvas {
+      display: block;
+    }
 
-  .character {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    transition: transform 0.15s linear;
-    pointer-events: none;
-  }
+    #hint {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 2px;
+      font-size: 14px;
+      pointer-events: none;
+    }
 
-  .shadow {
-    position: absolute;
-    width: 80px;
-    height: 20px;
-    background: rgba(0,0,0,0.4);
-    filter: blur(8px);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 0;
-  }
-
-  #hint {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    text-align: center;
-    color: rgba(255,255,255,0.6);
-    font-size: 16px;
-    letter-spacing: 1px;
-  }
-</style>
+    #rotate {
+      position: absolute;
+      inset: 0;
+      background: black;
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 10;
+    }
+  </style>
 </head>
 
 <body>
-  <div id="game">
-    <div id="hint">TAP ANYWHERE TO MOVE</div>
-  </div>
+  <div id="hint">TAP ANYWHERE TO MOVE</div>
+  <div id="rotate">Rotate your phone ↔</div>
 
-<script src="main.js"></script>
+  <canvas id="game"></canvas>
+
+  <script src="main.js"></script>
 </body>
 </html>
