@@ -2,6 +2,8 @@
 // BASIC THREE.JS SETUP
 // ============================
 
+alert("JS IS RUNNING");
+
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/GLTFLoader.js";
 
