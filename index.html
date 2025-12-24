@@ -1,57 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Find Love</title>
-
-  <!-- Force landscape look -->
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Find Love Game</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at center, #1a1a1a, #000);
       overflow: hidden;
-      touch-action: none;
-      font-family: system-ui, sans-serif;
+      background: #111;
     }
-
     canvas {
       display: block;
     }
-
-    #hint {
-      position: absolute;
-      top: 20px;
-      width: 100%;
-      text-align: center;
-      color: rgba(255,255,255,0.7);
-      letter-spacing: 2px;
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    #rotate {
-      position: absolute;
-      inset: 0;
-      background: black;
-      color: white;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      z-index: 10;
-    }
   </style>
 </head>
-
 <body>
-  <div id="hint">TAP ANYWHERE TO MOVE</div>
-  <div id="rotate">Rotate your phone ↔</div>
-
-  <canvas id="game"></canvas>
-
   <script src="main.js"></script>
 </body>
 </html>
