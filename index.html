@@ -3,61 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <title>Find Love</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       overflow: hidden;
-      background: radial-gradient(circle at top, #1a1a1a, #000);
+      background: radial-gradient(circle at top, #111, #000);
+      font-family: system-ui, sans-serif;
+      color: #eaeaea;
     }
 
-    #game {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
+    #hint {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 18px;
+      letter-spacing: 1px;
+      opacity: 0.7;
+      z-index: 10;
     }
 
     .character {
       position: absolute;
-      bottom: 80px;
-      width: 180px;
-      transition: transform 0.2s;
+      width: 120px;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s linear;
+      pointer-events: none;
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8));
     }
 
-    #monkey { left: 50px; }
-    #penguin { right: 80px; }
-    #villain { left: 45%; bottom: 60px; }
-
-    .float {
-      animation: float 2s ease-in-out infinite;
+    #villain {
+      width: 150px;
+      opacity: 0.9;
     }
 
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0); }
+    #penguin {
+      width: 130px;
     }
 
-    #msg {
-      position: absolute;
-      top: 30px;
-      width: 100%;
-      text-align: center;
-      font-size: 24px;
-      color: white;
-      font-family: monospace;
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      letter-spacing: 2px;
+      display: none;
+      z-index: 20;
     }
   </style>
 </head>
 
 <body>
-  <div id="game">
-    <div id="msg">Tap anywhere to move 🐒</div>
 
-    <img id="monkey" class="character float" src="assets/monkey.png" />
-    <img id="villain" class="character float" src="assets/villain.png" />
-    <img id="penguin" class="character float" src="assets/penguin.png" />
-  </div>
+  <div id="hint">TAP ANYWHERE TO MOVE</div>
+
+  <img id="monkey" class="character" src="monkey.png">
+  <img id="penguin" class="character" src="penguin.png">
+  <img id="villain" class="character" src="villain.png">
+
+  <div id="overlay"></div>
 
   <script src="main.js"></script>
 </body>
