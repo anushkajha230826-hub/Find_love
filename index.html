@@ -3,14 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <title>Find Love</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { margin: 0; overflow: hidden; background: black; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #1a1a1a, #000);
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .character {
+      position: absolute;
+      bottom: 80px;
+      width: 180px;
+      transition: transform 0.2s;
+    }
+
+    #monkey { left: 50px; }
+    #penguin { right: 80px; }
+    #villain { left: 45%; bottom: 60px; }
+
+    .float {
+      animation: float 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0); }
+    }
+
+    #msg {
+      position: absolute;
+      top: 30px;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      color: white;
+      font-family: monospace;
+    }
   </style>
 </head>
+
 <body>
+  <div id="game">
+    <div id="msg">Tap anywhere to move 🐒</div>
 
-<script type="module" src="main.js"></script>
+    <img id="monkey" class="character float" src="assets/monkey.png" />
+    <img id="villain" class="character float" src="assets/villain.png" />
+    <img id="penguin" class="character float" src="assets/penguin.png" />
+  </div>
 
+  <script src="main.js"></script>
 </body>
 </html>
